@@ -1,4 +1,3 @@
-version: "3.4"
 services:
   squid:
     image: sameersbn/squid:3.5.27-2    
@@ -8,4 +7,8 @@ services:
     volumes:
      - ./config/squid.conf:/etc/squid/squid.conf
     ports:
-     - "127.0.0.1:3128:3128"
+      #- "127.0.0.1:3128:3128"
+     - "192.168.0.3:3128:3128"
+    dns:
+     - 1.1.1.1
+     - 8.8.8.8
