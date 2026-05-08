@@ -5,7 +5,7 @@ services:
     image: ubuntu/squid:latest
     container_name: squid-proxy
     ports:
-      - "127.0.0.1:3128:3128"
+      - "${SQUID_BIND:-127.0.0.1}:${SQUID_PORT:-3128}:3128"
     volumes:
       - ./config/config.conf:/etc/squid/squid.conf
     restart: unless-stopped
