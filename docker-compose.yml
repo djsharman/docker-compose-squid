@@ -7,8 +7,11 @@ services:
     volumes:
      - ./config/squid.conf:/etc/squid/squid.conf
     ports:
-      #- "127.0.0.1:3128:3128"
-     - "192.168.0.3:3128:3128"
+      # Bind ALL interfaces, not a single address: 192.168.0.3 is a DHCP lease and
+      # the tailnet address is assigned by tailscaled — hard-coding either means a
+      # renumber silently fails the bind and the proxy is simply gone. Exposure is
+      # controlled by squid.conf's ACL (tailnet + LAN only), not by the bind address.
+     - "3128:3128"
     dns:
      - 1.1.1.1
      - 8.8.8.8
