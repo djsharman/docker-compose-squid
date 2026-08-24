@@ -1,63 +1,30 @@
 # Squid Proxy run as docker (docker-compose)
 
+Squid is a caching and forwarding HTTP web proxy. It has a wide variety of uses, including speeding up a web server by caching repeated requests
 
 
 
-## install Docker & Docker-compose
-
-Install Docker
-```cmd
-curl -sS https://get.docker.com/ | sh
-
-```
-
-Install Docker-compose
-
-```cmd
-curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-chmod +x /usr/local/bin/docker-compose
-
-docker-compose --version
-```
-
-## Run Squid Proxy
-
-1. clone this project 
-    ```cmd
-    git clone https://github.com/beigi-reza/squid-docker-compse.git
-    ```
-2. Run compse File
-   ```
-   docker-compse -f 
-   ```
+## With Authentication
+Run with [basic authentication](/with_authentication/readme.md)
 
 
-## Use 
+## Without Authentication
+Running Squid Proxy in internet without authentication is very dangerous and can lead to legal, security, and resource consumption issues.
 
-You can use the HTTP/HTTPS, ...  proxies on your local devices using **port forwarding**. The following SSH command makes the HTTP proxy available to the local device and the private network it uses.
+Run [without authentication](/without_authentication/readme.md)
 
-### in Windows 
-  1. run in cmd `ssh -vNL 3128:0.0.0.0:3128 root@<IP>`
-  2. Go to “Settings” > “Network & internet” > “Proxy.”
-  3. Under “Manual proxy setup,” toggle the “On” button.
-  4. Fill in Server : `127.0.0.1` and port : `3128`
-  5. clik Save
-  
-### in Linux
+## Layout note (hp)
 
-  1. run in terminal `ssh -vNL 3128:0.0.0.0:3128 root@<IP>`
-  2.  Set `http/s_proxy` variable
-   
-    ```cmd
-    export {http,https}_proxy="http://127.0.0.1:3128"
-    export {HTTP,HTTPS}_PROXY="http://127.0.0.1:3128"
-    ```
+`with_authentication/` and `without_authentication/` are the portable templates —
+bind and port are env-overridable via `SQUID_BIND` / `SQUID_PORT`.
 
+The **top-level `docker-compose.yml` + `config/squid.conf` are hp's live
+deployment** (container `squid`, project `squid-docker-compse`) and are kept
+deliberately: that is what the running proxy bind-mounts. It binds all interfaces
+so neither a DHCP renumber nor a tailscaled re-address can silently fail the bind,
+and scopes access in the ACL (tailnet + LAN) rather than by bind address.
 
-
-Unset in linux 
-```cmd
-unset {http,https}_proxy
-unset {HTTP,HTTPS}_PROXY
-```
+heron monitors it: a `proxy_egress` check proves traffic actually relays, and a
+`port_publish` check catches the failure that left this container serving nothing
+for 19 days in Aug 2026 (dockerd restarted under it and never rebuilt the port
+publish, while the container stayed `running` and healthy).
