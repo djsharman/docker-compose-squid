@@ -1,6 +1,9 @@
 services:
   squid:
-    image: sameersbn/squid:3.5.27-2    
+    # sameersbn/squid:3.5.27-2 (Ubuntu 18.04, unmaintained since 2018) carried 154
+    # fixable high/critical advisories; see Dockerfile for the refresh command.
+    build: .
+    image: hp/squid:6.6-24.04
     restart: always
     container_name: squid
     hostname: squid

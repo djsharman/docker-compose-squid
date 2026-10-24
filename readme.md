@@ -24,6 +24,11 @@ deliberately: that is what the running proxy bind-mounts. It binds all interface
 so neither a DHCP renumber nor a tailscaled re-address can silently fail the bind,
 and scopes access in the ACL (tailnet + LAN) rather than by bind address.
 
+The live image is built locally (`Dockerfile`): Canonical's `ubuntu/squid` on the
+24.04 LTS track plus the Ubuntu security pocket, because the upstream tag is only
+refreshed every few months. When Qual flags it, refresh with
+`docker compose build --pull --no-cache && docker compose up -d`.
+
 heron monitors it: a `proxy_egress` check proves traffic actually relays, and a
 `port_publish` check catches the failure that left this container serving nothing
 for 19 days in Aug 2026 (dockerd restarted under it and never rebuilt the port
